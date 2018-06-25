@@ -77,8 +77,8 @@ public class ServiceListener {
             try {
                 p.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+				System.err.println("Error thread has been killed");            
+			}
         });
     }
 
