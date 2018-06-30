@@ -18,7 +18,7 @@ public class ServiceListenerTest {
 
         ServiceListener.total = 0;
 
-        ServiceListener.updateIndicators("filename1",3);
+        ServiceListener.updateIndicators("filename1",3,3);
 
         Assert.assertNotNull(ServiceListener.files.get("filename1"));
 

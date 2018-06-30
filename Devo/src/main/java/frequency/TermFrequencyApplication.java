@@ -2,12 +2,16 @@ package frequency;
 
 import org.apache.commons.cli.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class TermFrequencyApplication {
 
     private static String path;
     private static String word;
     private static int top;
     private static long miliseconds;
+    private static final Logger LOGGER = Logger.getLogger( TermFrequencyApplication.class.getName() );
 
     private static Options options = new Options();
     static{
@@ -20,8 +24,8 @@ public class TermFrequencyApplication {
 
     public static void main(String... args) throws InterruptedException, ParseException {
         if (args.length < 8) {
-            System.out.println("Invalid number of arguments");
-            System.out.println("Example: -d test -n 3 -p 10000 -t hola");
+            LOGGER.log(Level.FINE,"Invalid number of arguments");
+            LOGGER.log(Level.FINE,"Example: -d test -n 3 -p 10000 -t hola");
             return;
         }
         readArguments(args);

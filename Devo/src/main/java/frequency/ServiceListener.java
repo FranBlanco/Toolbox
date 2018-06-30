@@ -2,6 +2,8 @@ package frequency;
 
 import java.io.File;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import static java.util.Collections.reverseOrder;
 
@@ -11,6 +13,8 @@ public class ServiceListener {
     private String word;
     private long miliseconds;
     private int top ;
+
+    private static final Logger LOGGER = Logger.getLogger( ServiceListener.class.getName() );
 
 
     public ServiceListener(String path, int top, String word, long miliseconds) {
@@ -30,13 +34,13 @@ public class ServiceListener {
 
     public static long totalFilesWithFrequency = 0;
 
-    public static void updateIndicators(String name, double frequency){
+    public static void updateIndicators(String name, double frequency, long num){
         if(files.get(name) != null ) {
             return ;
         }
         synchronized (lockMap){
             files.put(name,frequency);
-            total+=frequency;
+            total+=num;
             totalFilesWithFrequency++;
         }
     }
@@ -45,18 +49,19 @@ public class ServiceListener {
 
         File folder = new File(path);
 
-        List<ThreadParser> threads = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
         while(System.currentTimeMillis() < miliseconds){
 
             Thread.sleep(1000);
 
             File[] files =  folder.listFiles();
 
-            Arrays.stream(files).forEach(p-> threads.add(new ThreadParser(word,p)));
+            List<Thread> finalThreads = threads;
+            Arrays.stream(files).forEach(p-> finalThreads.add(new ThreadParser(word,p)));
 
         }
 
-        System.out.println("\n\nWaiting until all threads will finish....\n\n");
+        LOGGER.log(Level.FINE,("\n\nWaiting until all threads will finish....\n\n"));
 
         waitForThreads(threads);
 
@@ -72,20 +77,20 @@ public class ServiceListener {
         files.replace(fileName,calculate);
     }
 
-    private void waitForThreads(List<ThreadParser> threads) {
+    private void waitForThreads(List<Thread> threads) {
         threads.forEach(p -> {
             try {
                 p.join();
             } catch (InterruptedException e) {
-				System.err.println("Error thread has been killed");            
+                LOGGER.log(Level.FINER,"Error thread has been killed");
 			}
         });
     }
 
-    private List<ThreadParser> calculateResults() {
-        List<ThreadParser> threads = new ArrayList<>();
+    private List<Thread> calculateResults() {
+        List<Thread> threads = new ArrayList<>();
 
-        files.forEach((k,v)-threads.add(new ThreadCalculator(k,v)));
+        files.forEach((k,v)->threads.add(new ThreadCalculator(k,v)));
 
         return threads;
     }
